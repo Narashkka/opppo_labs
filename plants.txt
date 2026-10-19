@@ -1,0 +1,12 @@
+ADD Tree;Дуб;120
+ADD Tree;Береза;45
+ADD Shrub;Жасмин;июнь
+ADD Shrub;Сирень;май
+ADD Cactus;Лофофора;0.5
+ADD Cactus;Астрофитум;3.2
+ADD Shrub;Черемуха;май
+PRINT
+REM age < 50
+REM spine_length < 1.0
+REM month > май
+PRINT
