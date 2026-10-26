@@ -10,6 +10,17 @@
 - REM <условие> — удалить растения по условию (например, age > 100).
 - PRINT — вывести содержимое контейнера.
 """
+
+# Константы типов растений
+TYPE_TREE = "tree"
+TYPE_SHRUB = "shrub"
+TYPE_CACTUS = "cactus"
+
+# Константы параметров для условий удаления
+PARAM_AGE = "age"
+PARAM_SPINE_LENGTH = "spine_length"
+PARAM_MONTH = "month"
+
 from abc import ABC, abstractmethod
 
 class Plant(ABC):
@@ -122,17 +133,17 @@ class GardenContainer:
         for plant in self.plants:
             should_remove = False
 
-            if param_name == "age" and isinstance(plant, Tree):
+            if param_name == PARAM_AGE and isinstance(plant, Tree):
                 current_val = plant.age
                 val_to_comp = int(value_to_compare)
                 should_remove = self.check_condition(current_val, operator, val_to_comp)
 
-            elif param_name == "spine_length" and isinstance(plant, Cactus):
+            elif param_name == PARAM_SPINE_LENGTH and isinstance(plant, Cactus):
                 current_val = plant.spine_length
                 val_to_comp = float(value_to_compare)
                 should_remove = self.check_condition(current_val, operator, val_to_comp)
 
-            elif param_name == "month" and isinstance(plant, Shrub):
+            elif param_name == PARAM_MONTH and isinstance(plant, Shrub):
                 current_val = ALLOWED_MONTHS.index(plant.bloom_month) + 1
                 val_to_comp = ALLOWED_MONTHS.index(value_to_compare) + 1
                 should_remove = self.check_condition(current_val, operator, val_to_comp)
@@ -185,11 +196,11 @@ def process_file(filename, container):
             value = parts[2]
 
             try:
-                if obj_type == "tree":
+                if obj_type == TYPE_TREE:
                     container.add_plant(Tree(name, value))
-                elif obj_type == "shrub":
+                elif obj_type == TYPE_SHRUB:
                     container.add_plant(Shrub(name, value))
-                elif obj_type == "cactus":
+                elif obj_type == TYPE_CACTUS:
                     container.add_plant(Cactus(name, value))
                 else:
                     print(f"Неизвестный тип растения: {obj_type}")
