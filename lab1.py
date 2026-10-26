@@ -26,7 +26,11 @@ class Plant(ABC):
         pass
 
     def to_string(self):
-        return f"{self.get_type_name()} | Название: {self.name} | Уник. параметр: {self.get_unique_value()}"
+        return (
+            f"{self.get_type_name()} | Название: {self.name} |"
+            f"Уник. параметр: {self.get_unique_value()}"
+        )
+
 
 class Tree(Plant):
     """Дерево с уникальным параметром — возраст (целое число лет)"""
@@ -40,8 +44,10 @@ class Tree(Plant):
     def get_type_name(self):
         return "Дерево"
 
+
 ALLOWED_MONTHS = ["январь", "февраль", "март", "апрель", "май", "июнь",
                   "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
+
 
 class Shrub(Plant):
     """Кустарник с уникальным параметром — месяц цветения"""
@@ -58,6 +64,7 @@ class Shrub(Plant):
     def get_type_name(self):
         return "Кустарник"
 
+
 class Cactus(Plant):
     """Кактус с уникальным параметром — длина колючек (дробное число, см)"""
     def __init__(self, name, spine_length):
@@ -69,6 +76,7 @@ class Cactus(Plant):
 
     def get_type_name(self):
         return "Кактус"
+
 
 class GardenContainer:
     """Контейнер для хранения и управления коллекцией растений"""
@@ -92,7 +100,10 @@ class GardenContainer:
         """Удаляет растения, соответствующие заданному условию"""
         parts = condition_str.split()
         if len(parts) != 3:
-            print("Ошибка: неверный формат условия. Пример: age > 10")
+            print(
+                "Ошибка: неверный формат условия"
+                "Пример: age > 10"
+            )
             return
 
         param_name = parts[0]
@@ -135,11 +146,16 @@ class GardenContainer:
         print(f"Удалено объектов по условию '{condition_str}': {removed_count}")
 
     def check_condition(self, val1, op, val2):
-        if op == ">": return val1 > val2
-        if op == "<": return val1 < val2
-        if op == "==": return val1 == val2
-        if op == ">=": return val1 >= val2
-        if op == "<=": return val1 <= val2
+        if op == ">":
+            return val1 > val2
+        if op == "<":
+            return val1 < val2
+        if op == "==":
+            return val1 == val2
+        if op == ">=":
+            return val1 >= val2
+        if op == "<=":
+            return val1 <= val2
         return False
 
 def process_file(filename, container):
