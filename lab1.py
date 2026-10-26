@@ -1,6 +1,19 @@
+"""Учёт растений на складе.
+
+Поддерживаемые типы растений:
+- Tree (дерево) - уникальный параметр: возраст (целое число лет).
+- Shrub (кустарник) - уникальный параметр: месяц цветения.
+- Cactus (кактус) - уникальный параметр: длина колючек (дробное число).
+
+Команды обработки файла:
+- ADD <тип>;<название>;<значение> - добавить растение.
+- REM <условие> — удалить растения по условию (например, age > 100).
+- PRINT — вывести содержимое контейнера.
+"""
 from abc import ABC, abstractmethod
 
 class Plant(ABC):
+    """Абстрактный базовый класс растения"""
     def __init__(self, name):
         self.name = name
 
@@ -16,6 +29,7 @@ class Plant(ABC):
         return f"{self.get_type_name()} | Название: {self.name} | Уник. параметр: {self.get_unique_value()}"
 
 class Tree(Plant):
+    """Дерево с уникальным параметром — возраст (целое число лет)"""
     def __init__(self, name, age):
         super().__init__(name)
         self.age = int(age)
@@ -30,6 +44,7 @@ ALLOWED_MONTHS = ["январь", "февраль", "март", "апрель", 
                   "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
 
 class Shrub(Plant):
+    """Кустарник с уникальным параметром — месяц цветения"""
     def __init__(self, name, month_str):
         super().__init__(name)
         month_lower = month_str.lower()
@@ -44,6 +59,7 @@ class Shrub(Plant):
         return "Кустарник"
 
 class Cactus(Plant):
+    """Кактус с уникальным параметром — длина колючек (дробное число, см)"""
     def __init__(self, name, spine_length):
         super().__init__(name)
         self.spine_length = float(spine_length)
@@ -55,13 +71,16 @@ class Cactus(Plant):
         return "Кактус"
 
 class GardenContainer:
+    """Контейнер для хранения и управления коллекцией растений"""
     def __init__(self):
         self.plants = []
 
     def add_plant(self, plant):
+        """Добавляет растение"""
         self.plants.append(plant)
 
     def print_all(self):
+        """Выводит содержимое контейнера"""
         if not self.plants:
             print("Контейнер пуст.")
             return
@@ -70,6 +89,7 @@ class GardenContainer:
             print(f"{i + 1}. {self.plants[i].to_string()}")
 
     def remove_by_condition(self, condition_str):
+        """Удаляет растения, соответствующие заданному условию"""
         parts = condition_str.split()
         if len(parts) != 3:
             print("Ошибка: неверный формат условия. Пример: age > 10")
