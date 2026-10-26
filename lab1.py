@@ -93,8 +93,8 @@ class GardenContainer:
             print("Контейнер пуст.")
             return
 
-        for i in range(len(self.plants)):
-            print(f"{i + 1}. {self.plants[i].to_string()}")
+        for i, plant in enumerate(self.plants, start=1):
+            print(f"{i}. {plant.to_string()}")
 
     def remove_by_condition(self, condition_str):
         """Удаляет растения, соответствующие заданному условию"""
