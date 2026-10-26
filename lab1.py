@@ -21,6 +21,14 @@ PARAM_AGE = "age"
 PARAM_SPINE_LENGTH = "spine_length"
 PARAM_MONTH = "month"
 
+# Словарь операторов сравнения
+OPERATORS = {
+    ">": lambda a, b: a > b,
+    "<": lambda a, b: a < b,
+    "==": lambda a, b: a == b,
+    ">=": lambda a, b: a >= b,
+    "<=": lambda a, b: a <= b,
+}
 
 from abc import ABC, abstractmethod
 
@@ -158,17 +166,8 @@ class GardenContainer:
         print(f"Удалено объектов по условию '{condition_str}': {removed_count}")
 
     def check_condition(self, val1, op, val2):
-        if op == ">":
-            return val1 > val2
-        if op == "<":
-            return val1 < val2
-        if op == "==":
-            return val1 == val2
-        if op == ">=":
-            return val1 >= val2
-        if op == "<=":
-            return val1 <= val2
-        return False
+        func = OPERATORS.get(op)
+        return func(val1, val2) if func else False
 
 
 # Словарь-диспетчер для создания растений
