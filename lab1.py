@@ -11,104 +11,136 @@
 - PRINT — вывести содержимое контейнера.
 """
 
+from abc import ABC, abstractmethod
+from typing import Any, Callable, Dict, List, Optional, Type, cast
+
+
 # Константы типов растений
-TYPE_TREE = "tree"
-TYPE_SHRUB = "shrub"
-TYPE_CACTUS = "cactus"
+TYPE_TREE: str = "tree"
+TYPE_SHRUB: str = "shrub"
+TYPE_CACTUS: str = "cactus"
 
 # Константы параметров для условий удаления
-PARAM_AGE = "age"
-PARAM_SPINE_LENGTH = "spine_length"
-PARAM_MONTH = "month"
+PARAM_AGE: str = "age"
+PARAM_SPINE_LENGTH: str = "spine_length"
+PARAM_MONTH: str = "month"
 
 # Словарь операторов сравнения
-OPERATORS = {
+# Используем Any + cast, так как strict Protocol несовместим с int/float
+_OPERATORS_RAW: Dict[str, Callable[[Any, Any], bool]] = {
     ">": lambda a, b: a > b,
     "<": lambda a, b: a < b,
     "==": lambda a, b: a == b,
     ">=": lambda a, b: a >= b,
     "<=": lambda a, b: a <= b,
 }
+OPERATORS: Dict[str, Callable[[object, object], bool]] = cast(
+    Dict[str, Callable[[object, object], bool]], _OPERATORS_RAW
+)
 
-from abc import ABC, abstractmethod
 
 class Plant(ABC):
-    """Абстрактный базовый класс растения"""
-    def __init__(self, name):
+    """Абстрактный базовый класс растения."""
+
+    name: str
+
+    def __init__(self, name: str) -> None:
         self.name = name
 
     @abstractmethod
-    def get_unique_value(self):
+    def get_unique_value(self) -> str:
         pass
 
     @abstractmethod
-    def get_type_name(self):
+    def get_type_name(self) -> str:
         pass
 
-    def to_string(self):
+    def to_string(self) -> str:
         return (
-            f"{self.get_type_name()} | Название: {self.name} |"
+            f"{self.get_type_name()} | Название: {self.name} | "
             f"Уник. параметр: {self.get_unique_value()}"
         )
 
 
 class Tree(Plant):
-    """Дерево с уникальным параметром — возраст (целое число лет)"""
-    def __init__(self, name, age):
-        super().__init__(name)
-        self.age = int(age)
+    """Дерево с уникальным параметром — возраст (целое число лет)."""
 
-    def get_unique_value(self):
+    age: int
+
+    def __init__(self, name: str, age: int) -> None:
+        super().__init__(name)
+        self.age = age
+
+    def get_unique_value(self) -> str:
         return f"Возраст = {self.age} лет"
 
-    def get_type_name(self):
+    def get_type_name(self) -> str:
         return "Дерево"
 
 
-ALLOWED_MONTHS = ["январь", "февраль", "март", "апрель", "май", "июнь",
-                  "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"]
+ALLOWED_MONTHS: List[str] = [
+    "январь", "февраль", "март", "апрель", "май", "июнь",
+    "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
+]
 
 
 class Shrub(Plant):
-    """Кустарник с уникальным параметром — месяц цветения"""
-    def __init__(self, name, month_str):
+    """Кустарник с уникальным параметром — месяц цветения."""
+
+    bloom_month: str
+
+    def __init__(self, name: str, month_str: str) -> None:
         super().__init__(name)
-        month_lower = month_str.lower()
+        month_lower: str = month_str.lower()
         if month_lower not in ALLOWED_MONTHS:
             raise ValueError(f"Неизвестный месяц: {month_str}")
         self.bloom_month = month_lower
 
-    def get_unique_value(self):
+    def get_unique_value(self) -> str:
         return f"Месяц цветения = {self.bloom_month.capitalize()}"
 
-    def get_type_name(self):
+    def get_type_name(self) -> str:
         return "Кустарник"
 
 
 class Cactus(Plant):
-    """Кактус с уникальным параметром — длина колючек (дробное число, см)"""
-    def __init__(self, name, spine_length):
-        super().__init__(name)
-        self.spine_length = float(spine_length)
+    """Кактус с уникальным параметром — длина колючек (дробное число, см)."""
 
-    def get_unique_value(self):
+    spine_length: float
+
+    def __init__(self, name: str, spine_length: float) -> None:
+        super().__init__(name)
+        self.spine_length = spine_length
+
+    def get_unique_value(self) -> str:
         return f"Длина колючек = {self.spine_length} см"
 
-    def get_type_name(self):
+    def get_type_name(self) -> str:
         return "Кактус"
 
 
+# Словарь-диспетчер для создания растений
+PLANT_FACTORIES: Dict[str, Type[Plant]] = {
+    TYPE_TREE: Tree,
+    TYPE_SHRUB: Shrub,
+    TYPE_CACTUS: Cactus,
+}
+
+
 class GardenContainer:
-    """Контейнер для хранения и управления коллекцией растений"""
-    def __init__(self):
+    """Контейнер для хранения и управления коллекцией растений."""
+
+    plants: List[Plant]
+
+    def __init__(self) -> None:
         self.plants = []
 
-    def add_plant(self, plant):
-        """Добавляет растение"""
+    def add_plant(self, plant: Plant) -> None:
+        """Добавляет растение в контейнер."""
         self.plants.append(plant)
 
-    def print_all(self):
-        """Выводит содержимое контейнера"""
+    def print_all(self) -> None:
+        """Выводит содержимое контейнера на экран."""
         if not self.plants:
             print("Контейнер пуст.")
             return
@@ -116,46 +148,46 @@ class GardenContainer:
         for i, plant in enumerate(self.plants, start=1):
             print(f"{i}. {plant.to_string()}")
 
-    def remove_by_condition(self, condition_str):
-        """Удаляет растения, соответствующие заданному условию"""
-        parts = condition_str.split()
+    def remove_by_condition(self, condition_str: str) -> None:
+        """Удаляет растения, соответствующие заданному условию."""
+        parts: List[str] = condition_str.split()
         if len(parts) != 3:
             print(
-                "Ошибка: неверный формат условия"
+                "Ошибка: неверный формат условия. "
                 "Пример: age > 10"
             )
             return
 
-        param_name = parts[0]
-        operator = parts[1]
-        value_to_compare = parts[2]
+        param_name: str = parts[0]
+        operator: str = parts[1]
+        value_to_compare: str = parts[2]
 
-        if param_name == "month":
+        if param_name == PARAM_MONTH:
             value_to_compare = value_to_compare.lower()
             if value_to_compare not in ALLOWED_MONTHS:
                 print(f"Ошибка: неизвестный месяц '{value_to_compare}'")
                 return
 
-        new_plants_list = []
-        removed_count = 0
+        new_plants_list: List[Plant] = []
+        removed_count: int = 0
 
         for plant in self.plants:
-            should_remove = False
+            should_remove: bool = False
 
             if param_name == PARAM_AGE and isinstance(plant, Tree):
-                current_val = plant.age
-                val_to_comp = int(value_to_compare)
+                current_val: int = plant.age
+                val_to_comp: int = int(value_to_compare)
                 should_remove = self.check_condition(current_val, operator, val_to_comp)
 
             elif param_name == PARAM_SPINE_LENGTH and isinstance(plant, Cactus):
-                current_val = plant.spine_length
-                val_to_comp = float(value_to_compare)
-                should_remove = self.check_condition(current_val, operator, val_to_comp)
+                current_val_f: float = plant.spine_length
+                val_to_comp_f: float = float(value_to_compare)
+                should_remove = self.check_condition(current_val_f, operator, val_to_comp_f)
 
             elif param_name == PARAM_MONTH and isinstance(plant, Shrub):
-                current_val = ALLOWED_MONTHS.index(plant.bloom_month) + 1
-                val_to_comp = ALLOWED_MONTHS.index(value_to_compare) + 1
-                should_remove = self.check_condition(current_val, operator, val_to_comp)
+                current_val_i: int = ALLOWED_MONTHS.index(plant.bloom_month) + 1
+                val_to_comp_i: int = ALLOWED_MONTHS.index(value_to_compare) + 1
+                should_remove = self.check_condition(current_val_i, operator, val_to_comp_i)
 
             if should_remove:
                 removed_count += 1
@@ -165,22 +197,19 @@ class GardenContainer:
         self.plants = new_plants_list
         print(f"Удалено объектов по условию '{condition_str}': {removed_count}")
 
-    def check_condition(self, val1, op, val2):
-        func = OPERATORS.get(op)
-        return func(val1, val2) if func else False
+    def check_condition(self, val1: object, op: str, val2: object) -> bool:
+        """Проверяет условие сравнения двух значений."""
+        func: Optional[Callable[[object, object], bool]] = OPERATORS.get(op)
+        if func is None:
+            return False
+        return func(val1, val2)
 
 
-# Словарь-диспетчер для создания растений
-PLANT_FACTORIES = {
-    TYPE_TREE: Tree,
-    TYPE_SHRUB: Shrub,
-    TYPE_CACTUS: Cactus,
-}
-
-def process_file(filename, container):
+def process_file(filename: str, container: GardenContainer) -> None:
+    """Читает файл команд и обрабатывает их."""
     try:
         with open(filename, "r", encoding="utf-8") as file:
-            lines = file.readlines()
+            lines: List[str] = file.readlines()
     except FileNotFoundError:
         print(f"Файл {filename} не найден")
         return
@@ -193,27 +222,28 @@ def process_file(filename, container):
         print(f"\nВыполняется команда: {line}")
 
         if line.startswith("ADD "):
-            data_part = line[4:].strip()
-            parts = data_part.split(";")
+            data_part: str = line[4:].strip()
+            parts: List[str] = data_part.split(";")
             if len(parts) != 3:
                 print("Ошибка формата ADD. Нужно: ADD Тип;Название;Значение")
                 continue
 
-            obj_type = parts[0].lower()
-            name = parts[1]
-            value = parts[2]
+            obj_type: str = parts[0].lower()
+            name: str = parts[1]
+            value: str = parts[2]
 
-            factory = PLANT_FACTORIES.get(obj_type)
+            factory: Optional[Type[Plant]] = PLANT_FACTORIES.get(obj_type)
             if factory is None:
                 print(f"Неизвестный тип растения: {obj_type}")
             else:
                 try:
-                    container.add_plant(factory(name, value))
+                    # так как преобразование происходит безопасно внутри конструктора
+                    container.add_plant(factory(name, value))  # type: ignore[call-arg]
                 except ValueError as e:
                     print(f"Ошибка при добавлении: {e}")
 
         elif line.startswith("REM "):
-            condition = line[4:].strip()
+            condition: str = line[4:].strip()
             container.remove_by_condition(condition)
 
         elif line == "PRINT":
@@ -222,9 +252,10 @@ def process_file(filename, container):
         else:
             print("Неизвестная команда")
 
+
 if __name__ == "__main__":
-    garden = GardenContainer()
-    input_file = "plants.txt"
+    garden: GardenContainer = GardenContainer()
+    input_file: str = "plants.txt"
 
     print("Программа обработки артефактов (Растения)")
     process_file(input_file, garden)
