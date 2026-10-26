@@ -21,6 +21,7 @@ PARAM_AGE = "age"
 PARAM_SPINE_LENGTH = "spine_length"
 PARAM_MONTH = "month"
 
+
 from abc import ABC, abstractmethod
 
 class Plant(ABC):
@@ -169,6 +170,14 @@ class GardenContainer:
             return val1 <= val2
         return False
 
+
+# Словарь-диспетчер для создания растений
+PLANT_FACTORIES = {
+    TYPE_TREE: Tree,
+    TYPE_SHRUB: Shrub,
+    TYPE_CACTUS: Cactus,
+}
+
 def process_file(filename, container):
     try:
         with open(filename, "r", encoding="utf-8") as file:
@@ -195,17 +204,14 @@ def process_file(filename, container):
             name = parts[1]
             value = parts[2]
 
-            try:
-                if obj_type == TYPE_TREE:
-                    container.add_plant(Tree(name, value))
-                elif obj_type == TYPE_SHRUB:
-                    container.add_plant(Shrub(name, value))
-                elif obj_type == TYPE_CACTUS:
-                    container.add_plant(Cactus(name, value))
-                else:
-                    print(f"Неизвестный тип растения: {obj_type}")
-            except ValueError as e:
-                print(f"Ошибка при добавлении: {e}")
+            factory = PLANT_FACTORIES.get(obj_type)
+            if factory is None:
+                print(f"Неизвестный тип растения: {obj_type}")
+            else:
+                try:
+                    container.add_plant(factory(name, value))
+                except ValueError as e:
+                    print(f"Ошибка при добавлении: {e}")
 
         elif line.startswith("REM "):
             condition = line[4:].strip()
